@@ -1,0 +1,4190 @@
+# Project Setup
+
+## npm init -y
+
+Purpose:
+Creates package.json, which acts as the project's manifest file.
+
+Key Points:
+- Stores project metadata.
+- Stores dependencies and devDependencies.
+- Stores npm scripts.
+- Defines project entry point.
+
+## Installed Packages
+
+### express
+
+Purpose:
+Backend framework used to create APIs and handle HTTP requests.
+
+### dotenv
+
+Purpose:
+Loads environment variables from .env into process.env.
+
+### cors
+
+Purpose:
+Allows frontend and backend running on different origins to communicate.
+
+### nodemon
+
+Purpose:
+Automatically restarts the server whenever source files change during development.
+
+## Project Structure
+
+### src/index.js
+
+Application entry point.
+
+Responsibilities:
+- Load configuration.
+- Connect database.
+- Start server.
+
+### src/app.js
+
+Express application configuration.
+
+Responsibilities:
+- Create Express app.
+- Register middleware.
+- Register routes.
+
+## ES Modules
+
+The project uses ES Modules by setting:
+
+"type": "module"
+
+Benefits:
+- Modern import/export syntax.
+- Better consistency with React and modern JavaScript.
+- Industry standard for new projects.
+
+## npm Scripts
+
+### dev
+
+Runs the server using nodemon.
+
+## Express Server Setup
+
+### app.js
+
+Purpose:
+Creates and exports the Express application.
+
+```js
+import express from "express";
+
+const app = express();
+
+export default app;
+```
+
+### index.js
+
+Purpose:
+Starts the Express server.
+
+```js
+import app from "./app.js";
+
+const PORT = 8000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+```
+
+### Why Separate app.js and index.js?
+
+- app.js → Configure the application.
+- index.js → Start the server.
+
+This separation makes testing and scaling easier.
+
+### Server Startup Flow
+
+```text
+npm run dev
+    ↓
+nodemon src/index.js
+    ↓
+index.js executes
+    ↓
+imports app.js
+    ↓
+Express app created
+    ↓
+app.listen(PORT)
+    ↓
+Server starts listening
+```
+
+## First Route
+
+### Code
+
+```js
+app.get("/", (req, res) => {
+    res.send("OpenHealth API Running");
+});
+```
+
+### Purpose
+
+Creates the first API endpoint.
+
+### Request Flow
+
+```text
+Browser
+    ↓
+GET /
+    ↓
+Express Route Handler
+    ↓
+res.send()
+    ↓
+Response Returned
+```
+
+### Test
+
+Open:
+
+http://localhost:8000
+
+Expected Response:
+
+```text
+OpenHealth API Running
+```
+
+## Routes
+
+### Why Routes?
+
+Routes keep endpoints organized.
+
+Instead of putting every endpoint in app.js, we group related endpoints into separate files.
+
+### health.routes.js
+
+Purpose:
+Contains health check endpoints.
+
+### Route Registration Flow
+
+Request
+↓
+app.js
+↓
+app.use("/", healthRouter)
+↓
+health.routes.js
+↓
+Route Handler
+↓
+Response
+
+## Controller Layer
+
+### health.controller.js
+
+Contains the logic for health check requests.
+
+### Route-Controller Flow
+
+Browser
+↓
+Route
+↓
+Controller
+↓
+Response
+
+Benefits:
+- Cleaner routes
+- Better code organization
+- Easier testing and maintenance
+
+## Environment Variables
+
+### .env
+
+Stores sensitive configuration outside source code.
+
+Examples:
+- PORT
+- MONGODB_URI
+- JWT_SECRET
+- EMAIL_USER
+- EMAIL_PASSWORD
+
+### dotenv
+
+Purpose:
+Loads variables from .env into process.env.
+
+Flow:
+
+.env
+↓
+dotenv.config()
+↓
+process.env
+↓
+Application
+
+## Database Layer
+
+### db/index.js
+
+Purpose:
+Connects the application to MongoDB Atlas.
+
+### Mongoose
+
+Purpose:
+Provides a schema-based interface for MongoDB.
+
+### Connection Flow
+
+Server Start
+↓
+dotenv loads .env
+↓
+connectDB()
+↓
+MongoDB Atlas
+↓
+Connection Successful
+↓
+Start Server
+
+### Why Connect Database Before Starting Server?
+
+If the database is unavailable, the application should not accept requests.
+
+## First Model: Patient
+
+Purpose:
+Stores patient account and profile information.
+
+### Current Fields
+
+- fullName
+- email
+- phone
+- password
+- dateOfBirth
+- gender
+- bloodGroup
+- allergies
+- ohid
+
+### Mongoose Model Flow
+
+Request
+↓
+Controller
+↓
+Patient Model
+↓
+MongoDB Collection
+↓
+Database
+
+## Patient Module Structure
+
+### patient.routes.js
+
+Purpose:
+Defines patient-related endpoints.
+
+Current Endpoint:
+
+```http
+POST /api/v1/patients/register
+```
+
+### patient.controller.js
+
+Purpose:
+Contains patient-related business logic.
+
+Examples:
+- Register Patient
+- Login Patient
+- Forgot Password
+- Update Profile
+
+### patient.model.js
+
+Purpose:
+Defines how patient data is stored in MongoDB.
+
+### Module Flow
+
+POST Request
+↓
+patient.routes.js
+↓
+patient.controller.js
+↓
+patient.model.js
+↓
+MongoDB
+↓
+Response
+
+## express.json()
+
+Purpose:
+Parses incoming JSON request bodies.
+
+Flow:
+
+Client
+↓
+JSON Request
+↓
+express.json()
+↓
+req.body
+↓
+Controller
+
+## Patient Module Structure
+
+### patient.routes.js
+
+Purpose:
+Defines patient-related endpoints.
+
+Current Endpoint:
+
+POST /api/v1/patients/register
+
+### patient.controller.js
+
+Purpose:
+Contains patient-related business logic.
+
+Examples:
+- Register Patient
+- Login Patient
+- Forgot Password
+
+### patient.model.js
+
+Purpose:
+Defines how patient data is stored in MongoDB.
+
+### Module Flow
+
+POST Request
+↓
+patient.routes.js
+↓
+patient.controller.js
+↓
+patient.model.js
+↓
+MongoDB
+↓
+Response
+
+## Database Layer
+
+### db/index.js
+
+Purpose:
+Connects the application to MongoDB Atlas.
+
+### Connection Flow
+
+Server Start
+↓
+dotenv loads .env
+↓
+connectDB()
+↓
+MongoDB Atlas
+↓
+Connection Successful
+↓
+Start Server
+
+### Why Connect Database Before Starting Server?
+
+If the database is unavailable, the application should not accept requests.
+
+## Patient Registration Request Flow
+
+POST /api/v1/patients/register
+
+Postman
+↓
+patient.routes.js
+↓
+patient.controller.js
+↓
+req.body
+↓
+Response
+
+## Patient Registration
+
+### Endpoint
+
+POST /api/v1/patients/register
+
+### Flow
+
+Postman
+↓
+patient.routes.js
+↓
+patient.controller.js
+↓
+Patient.create()
+↓
+MongoDB Atlas
+↓
+Response
+
+### Status
+
+Patient data is now successfully stored in MongoDB.
+## Password Hashing
+
+Passwords are hashed using bcrypt before being stored in MongoDB.
+
+Flow:
+
+Plain Password
+↓
+bcrypt.hash()
+↓
+Hashed Password
+↓
+MongoDB
+## OpenHealth ID (OHID)
+
+A unique OHID is generated for every patient during registration.
+
+Purpose:
+Provides a unique identifier that can later be used by doctors, labs and family features.
+
+## Error Handling
+
+Purpose:
+Prevents application crashes and returns meaningful responses.
+
+Flow:
+
+Request
+↓
+try
+↓
+Business Logic
+↓
+Success Response
+
+OR
+
+catch
+↓
+Log Error
+↓
+500 Internal Server Error
+
+## Login Endpoint
+
+POST /api/v1/patients/login
+
+Purpose:
+Authenticates an existing patient.
+
+Current Status:
+Route and controller connected successfully.
+
+Flow:
+
+Postman
+↓
+patient.routes.js
+↓
+loginPatient()
+↓
+Response
+
+## Login Authentication
+
+Purpose:
+Verifies patient credentials during login.
+
+Flow:
+
+Request
+↓
+Find Patient by Email
+↓
+Patient Found?
+├── No → Invalid Credentials
+└── Yes
+    ↓
+bcrypt.compare()
+    ↓
+Password Correct?
+    ├── No → Invalid Credentials
+    └── Yes → Login Success
+
+## JWT (JSON Web Token)
+
+Purpose:
+Maintains user authentication after login.
+
+Flow:
+
+Login
+↓
+Generate JWT
+↓
+Send Token
+↓
+Store Token
+↓
+Use Token For Future Requests
+
+Benefits:
+- Stateless authentication
+- Secure user identification
+- Protects private routes
+
+## JWT Authentication
+
+Purpose:
+Maintains authentication after successful login.
+
+Implementation:
+
+jsonwebtoken package is used to generate a token.
+
+Payload:
+
+- patientId
+- ohid
+
+Token Expiry:
+
+7 days
+
+Flow:
+
+Login Request
+↓
+Find Patient
+↓
+bcrypt.compare()
+↓
+Generate JWT
+↓
+Send Token
+↓
+Frontend Stores Token
+
+## Login Controller
+
+Purpose:
+Authenticates an existing patient.
+
+Process:
+
+1. Receive email and password.
+2. Find patient by email.
+3. Compare password using bcrypt.compare().
+4. Generate JWT on successful authentication.
+5. Return token to the client.
+
+## Authentication Middleware
+
+Purpose:
+Protect private routes.
+
+Flow:
+
+Request
+↓
+JWT Middleware
+↓
+Verify Token
+↓
+Extract Patient Information
+↓
+Allow Access
+
+Benefits:
+- Prevents unauthorized access
+- Identifies the logged-in patient
+- Enables protected APIs
+
+## JWT Verification Middleware
+
+File:
+src/middlewares/auth.middleware.js
+
+Purpose:
+Verifies JWT before allowing access to protected routes.
+
+Flow:
+
+Request
+↓
+Authorization Header
+↓
+jwt.verify()
+↓
+Decoded Payload
+↓
+req.patient
+↓
+next()
+
+Failure:
+401 Unauthorized
+
+## Protected Route: Patient Profile
+
+Endpoint:
+GET /api/v1/patients/profile
+
+Purpose:
+Returns information about the currently authenticated patient.
+
+Flow:
+
+Request
+↓
+JWT Middleware
+↓
+Verify Token
+↓
+Extract Payload
+↓
+Controller
+↓
+Response
+
+Requirement:
+Authorization header containing a valid JWT.
+
+## Protected Route: Patient Profile
+
+Endpoint:
+GET /api/v1/patients/profile
+
+Purpose:
+Returns information about the currently authenticated patient.
+
+Flow:
+
+Request
+↓
+JWT Middleware
+↓
+Verify Token
+↓
+Extract Payload
+↓
+Controller
+↓
+Response
+
+Requirement:
+Authorization header containing a valid JWT.
+
+## JWT Protected Routes
+
+Purpose:
+Protect sensitive endpoints so that only authenticated patients can access them.
+
+Files:
+- src/middlewares/auth.middleware.js
+- src/controllers/patient.controller.js
+- src/routes/patient.routes.js
+
+Flow:
+
+Login
+↓
+JWT Generated
+↓
+Client Sends Token
+↓
+JWT Middleware
+↓
+Token Verified
+↓
+Request Allowed
+↓
+Controller Executes
+
+Outcome:
+Successfully implemented the first protected route:
+GET /api/v1/patients/profile
+
+## JWT Protected Route
+
+Purpose:
+Protect patient-specific endpoints using JWT authentication.
+
+Files:
+- auth.middleware.js
+- patient.controller.js
+- patient.routes.js
+
+Outcome:
+Implemented GET /api/v1/patients/profile as the first protected route.
+## Full Patient Profile Fetch
+
+Purpose:
+Retrieve complete patient information from MongoDB after JWT verification.
+
+Flow:
+
+JWT
+↓
+Extract patientId
+↓
+Patient.findById()
+↓
+Remove Password
+↓
+Return Profile
+
+Outcome:
+Profile endpoint now returns actual patient data instead of only JWT payload.
+
+## Update Patient Profile
+
+Endpoint:
+PATCH /api/v1/patients/profile
+
+Purpose:
+Allow authenticated patients to update their personal information.
+
+Fields:
+- fullName
+- phone
+- dateOfBirth
+- gender
+- bloodGroup
+- allergies
+
+Flow:
+
+JWT
+↓
+Verify Token
+↓
+Find Patient
+↓
+Update Fields
+↓
+Return Updated Profile
+
+Outcome:
+Patients can update and maintain their health profile information.
+
+## Change Password
+
+Endpoint:
+PATCH /api/v1/patients/change-password
+
+Purpose:
+Allow authenticated patients to securely change their password.
+
+Files:
+- patient.controller.js
+- patient.routes.js
+- auth.middleware.js
+
+Flow:
+
+JWT
+↓
+Verify Token
+↓
+Find Patient
+↓
+Verify Old Password
+↓
+bcrypt.compare()
+↓
+Hash New Password
+↓
+Save Updated Password
+↓
+Success Response
+
+Outcome:
+Authenticated patients can change their account password securely.
+
+## Forgot Password Architecture
+
+Purpose:
+Allow patients to reset forgotten passwords using OTP verification.
+
+Storage Strategy:
+OTP data is stored directly in the Patient document.
+
+Fields:
+- resetOtp
+- resetOtpExpiry
+
+Reason:
+Simpler implementation for MVP and avoids creating a separate OTP collection.
+
+Flow:
+
+Patient
+↓
+Request OTP
+↓
+OTP Generated
+↓
+Store OTP + Expiry
+↓
+Verify OTP
+↓
+Reset Password
+
+## Forgot Password - OTP Generation
+
+Endpoint:
+POST /api/v1/patients/forgot-password
+
+Purpose:
+Generate a password reset OTP for a registered patient.
+
+Flow:
+
+Email
+↓
+Find Patient
+↓
+Generate 6-Digit OTP
+↓
+Store OTP
+↓
+Store OTP Expiry
+↓
+Success Response
+
+Outcome:
+Patients can request a temporary OTP for password recovery.
+
+## Forgot Password - OTP Generation
+
+Endpoint:
+POST /api/v1/patients/forgot-password
+
+Purpose:
+Generate a password reset OTP for a registered patient.
+
+Fields Added:
+- resetOtp
+- resetOtpExpiry
+
+Flow:
+
+Email
+↓
+Find Patient
+↓
+Generate 6-Digit OTP
+↓
+Store OTP
+↓
+Store OTP Expiry (10 Minutes)
+↓
+Save Patient Document
+↓
+Success Response
+
+Outcome:
+Patients can request a temporary OTP for password recovery.
+
+Implementation Notes:
+- OTP is currently a randomly generated 6-digit number.
+- OTP is stored directly in the Patient document.
+- OTP expires after 10 minutes.
+- Only the latest generated OTP remains valid.
+
+## Forgot Password - OTP Verification
+
+Endpoint:
+POST /api/v1/patients/verify-otp
+
+Purpose:
+Verify the OTP generated during password recovery.
+
+Flow:
+
+Email
+↓
+Find Patient
+↓
+Compare OTP
+↓
+Check OTP Expiry
+↓
+Verification Success
+
+Outcome:
+Patient is authorized to reset the password.
+
+Validation Rules:
+- Patient must exist.
+- OTP must match the stored OTP.
+- OTP must not be expired.
+- Only the latest generated OTP is valid.
+
+## Forgot Password - Reset Password
+
+Endpoint:
+POST /api/v1/patients/reset-password
+
+Purpose:
+Allow patients to create a new password after successful OTP verification.
+
+Flow:
+
+Email
+↓
+Find Patient
+↓
+Verify OTP
+↓
+Check OTP Expiry
+↓
+Hash New Password
+↓
+Update Password
+↓
+Clear OTP Fields
+↓
+Success Response
+
+Outcome:
+Patient regains access to the account using a newly created password.
+
+Security:
+- Password is hashed using bcrypt.
+- OTP is cleared after successful reset.
+- Expired OTPs are rejected. 
+
+## Doctor Model
+
+Purpose:
+Stores doctor account and professional information.
+
+Fields:
+- fullName
+- email
+- phone
+- password
+- registrationNumber
+- qualification
+- specialization
+- workplace
+
+Notes:
+- Doctor identity belongs to the doctor, not the hospital.
+- Workplace can be changed when switching hospitals or opening a private clinic.
+- Registration number is unique for every doctor.
+
+## Doctor Registration
+
+Endpoint:
+POST /api/v1/doctors/register
+
+Purpose:
+Create a new doctor account.
+
+Fields:
+- fullName
+- email
+- phone
+- password
+- registrationNumber
+- qualification
+- specialization
+- workplace
+
+Validation:
+- Unique email
+- Unique phone
+- Unique registration number
+
+Security:
+- Password is hashed using bcrypt before storage.
+
+Flow:
+
+Request
+↓
+Check Existing Doctor
+↓
+Hash Password
+↓
+Create Doctor
+↓
+Store In MongoDB
+↓
+Success Response
+
+## Doctor Health ID (DHID)
+
+Purpose:
+A unique identifier assigned to every doctor during registration.
+
+Format:
+
+DH-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+Benefits:
+- Unique doctor identification
+- Audit trail support
+- Prescription ownership tracking
+- Hospital-independent identity
+
+Example:
+
+DH-8a92bcf1-1234-5678-9abc-123456789def
+
+## Doctor Login
+
+Endpoint:
+POST /api/v1/doctors/login
+
+Purpose:
+Authenticates a doctor and returns a JWT token.
+
+Flow:
+
+Email + Password
+↓
+Find Doctor
+↓
+bcrypt.compare()
+↓
+Generate JWT
+↓
+Return Token
+
+JWT Payload:
+
+- doctorId
+- dhid
+
+Token Expiry:
+
+7 Days
+
+Outcome:
+Authenticated doctors can access protected APIs.
+
+## Doctor Authentication Middleware
+
+File:
+src/middlewares/doctorAuth.middleware.js
+
+Purpose:
+Protects doctor-only routes by verifying JWT tokens.
+
+Flow:
+
+Request
+↓
+Authorization Header
+↓
+Extract Token
+↓
+jwt.verify()
+↓
+Find Doctor
+↓
+req.doctor
+↓
+next()
+
+Failure Cases:
+
+- Missing Token → 401 Unauthorized
+- Invalid Token → 401 Unauthorized
+- Doctor Not Found → 404 Not Found
+
+Outcome:
+Only authenticated doctors can access protected doctor routes.
+
+## Medical Case Model
+
+Purpose:
+Stores a complete medical case for a patient.
+
+Examples:
+
+- ACL Injury
+- Diabetes
+- Seasonal Allergy
+- Vitamin D Deficiency
+
+Contains:
+
+- Diagnosis
+- Reports
+- Prescriptions
+- Doctors
+- Verdict
+- Final Advice
+- Status
+
+Benefits:
+
+- Organizes medical history into cases
+- Enables expandable timeline UI
+- Supports future AI summaries
+- Supports doctor and lab integrations
+
+## Create Medical Case
+
+Endpoint:
+POST /api/v1/medical-case/create
+
+Purpose:
+Creates a new medical case for an authenticated patient.
+
+Flow:
+
+Patient
+↓
+JWT Verification
+↓
+Extract Medical Case Data
+↓
+MedicalCase.create()
+↓
+MongoDB
+↓
+Success Response
+
+Request Body:
+
+{
+  "diagnosis": "ACL Injury",
+  "verdict": "Grade 2 ACL Sprain",
+  "finalAdvice": "Continue Physiotherapy"
+}
+
+Outcome:
+A new medical case is created and added to the patient's medical timeline.
+
+## Get Medical Case By ID
+
+Endpoint:
+GET /api/v1/medical-case/:caseId
+
+Purpose:
+Returns a specific medical case belonging to the authenticated patient.
+
+Flow:
+
+Request
+↓
+Patient JWT Middleware
+↓
+Verify Token
+↓
+Extract caseId from URL
+↓
+MedicalCase.findById()
+↓
+Ownership Verification
+↓
+Success Response
+
+Requirement:
+Authorization header containing a valid patient JWT.
+
+Security:
+Patients can only access medical cases that belong to them.
+
+Failure Cases:
+
+- Invalid Case ID → 404 Not Found
+- Case Does Not Exist → 404 Not Found
+- Case Belongs To Another Patient → 403 Forbidden
+
+Outcome:
+Returns complete information for a single medical case, enabling expandable timeline views in the frontend.
+
+## Security Improvement
+
+Issue:
+Any authenticated patient could potentially access another patient's medical case if they knew the case ID.
+
+Fix:
+Added ownership verification before returning medical case data.
+
+Implementation:
+
+if (
+    medicalCase.patientId.toString() !==
+    req.patient.patientID
+){
+    return res.status(403).json({
+        message : "Access denied"
+    })
+}
+
+Lesson:
+Authentication confirms identity. Authorization confirms permissions. Both are required when handling sensitive medical records.
+
+## Timeline Backend V1
+
+Implemented APIs:
+
+- Create Medical Case
+- Get My Medical Cases
+- Get Medical Case By ID
+
+Security:
+
+- JWT Authentication
+- Ownership Verification
+- Protected Patient Routes
+
+Outcome:
+
+Patients can create medical cases, view their medical timeline, and access detailed information for individual cases.
+
+## Report Model
+
+Purpose:
+Stores medical reports associated with a specific medical case.
+
+Examples:
+
+- MRI Report
+- X-Ray Report
+- Blood Test Report
+- Prescription PDF
+
+Relationships:
+
+Patient
+↓
+Medical Case
+↓
+Report
+
+Fields:
+
+- medicalCaseId
+- reportName
+- reportType
+- fileUrl
+- fileType
+- uploadedByType
+- uploadedById
+
+Report Types:
+
+- Blood Test
+- MRI
+- X-Ray
+- CT-Scan
+- Ultrasound
+- Prescription
+- Other
+
+Uploader Types:
+
+- Patient
+- Doctor
+- Lab
+
+Benefits:
+
+- Keeps reports organized under a medical case
+- Supports PDF and image uploads
+- Enables future AI analysis
+- Enables doctor, patient and lab uploads
+- Supports expandable timeline UI
+
+Outcome:
+
+Medical reports can be linked to medical cases while maintaining scalability for future integrations.
+
+## Create Report API
+
+Endpoint:
+POST /api/v1/reports/create
+
+Purpose:
+Creates a medical report and links it to an existing medical case.
+
+Flow:
+
+Patient JWT
+↓
+Verify Token
+↓
+Verify Medical Case Exists
+↓
+Verify Ownership
+↓
+Report.create()
+↓
+MongoDB
+↓
+Success Response
+
+Request Body:
+
+{
+  "medicalCaseId": "...",
+  "reportName": "MRI Report",
+  "reportType": "MRI",
+  "fileUrl": "https://example.com/mri-report.pdf",
+  "fileType": "pdf"
+}
+
+Security:
+
+- Medical Case must exist
+- Medical Case must belong to the authenticated patient
+
+Report Metadata:
+
+- uploadedByType = Patient
+- uploadedById = Authenticated Patient ID
+
+Outcome:
+
+Patients can upload reports to their own medical cases while preventing unauthorized access to other patients' records.
+
+## Get Reports By Medical Case
+
+Endpoint:
+GET /api/v1/reports/case/:medicalCaseId
+
+Purpose:
+Returns all reports belonging to a specific medical case.
+
+Flow:
+
+Patient JWT
+↓
+Verify Token
+↓
+Find Medical Case
+↓
+Verify Ownership
+↓
+Report.find()
+↓
+Success Response
+
+Requirement:
+
+- Valid Patient JWT
+- Medical Case must exist
+- Medical Case must belong to authenticated patient
+
+Response:
+
+[
+  {
+    "reportName": "MRI Report",
+    "reportType": "MRI"
+  },
+  {
+    "reportName": "Blood Test",
+    "reportType": "Blood Test"
+  }
+]
+
+Outcome:
+
+Patients can retrieve all reports associated with a medical case while ensuring report access remains restricted to the owner of the medical case.
+
+## Get Report By ID
+
+Endpoint:
+GET /api/v1/reports/:reportId
+
+Purpose:
+Returns details of a specific report.
+
+Flow:
+
+Patient JWT
+↓
+Verify Token
+↓
+Find Report
+↓
+Verify Report Exists
+↓
+Find Medical Case
+↓
+Verify Ownership
+↓
+Success Response
+
+Requirement:
+
+- Valid Patient JWT
+- Report must exist
+- Report must belong to a medical case owned by the authenticated patient
+
+Security:
+
+Ownership is verified through the parent Medical Case rather than the Report itself.
+
+Relationship:
+
+Patient
+↓
+Medical Case
+↓
+Report
+
+Outcome:
+
+Patients can securely access individual reports while preventing unauthorized access to reports belonging to other patients.
+
+## Doctor Note Model
+
+Purpose:
+Stores doctor observations and comments associated with a medical report.
+
+Relationship:
+
+Patient
+↓
+Medical Case
+↓
+Report
+↓
+Doctor Note
+
+Fields:
+
+- reportId
+- doctorId
+- note
+
+Benefits:
+
+- Allows doctors to comment on reports
+- Maintains report-specific observations
+- Supports multiple doctor opinions
+- Provides structured medical feedback
+
+Outcome:
+
+Doctors can attach professional observations directly to reports while maintaining a scalable medical record structure.
+
+## Create Doctor Note API
+
+Endpoint:
+POST /api/v1/doctor-notes/create
+
+Purpose:
+Allows authenticated doctors to add notes to medical reports.
+
+Flow:
+
+Doctor JWT
+↓
+Verify Token
+↓
+Find Report
+↓
+Verify Report Exists
+↓
+DoctorNote.create()
+↓
+MongoDB
+↓
+Success Response
+
+Request Body:
+
+{
+  "reportId": "...",
+  "note": "ACL tear visible in MRI. Continue physiotherapy."
+}
+
+Security:
+
+- Valid Doctor JWT required
+- Report must exist
+
+Metadata:
+
+- doctorId is automatically extracted from authenticated doctor
+
+Outcome:
+
+Doctors can attach professional observations and recommendations to patient reports.
+
+# Report Delete API
+
+## Endpoint
+
+```http
+DELETE /api/v1/reports/:reportId
+```
+
+## Purpose
+
+Allows patients to permanently delete a report.
+
+## Security
+
+- Valid Patient JWT required
+- Report must exist
+- Parent Medical Case must exist
+- Medical Case must belong to the authenticated patient
+
+## Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Find Report
+
+↓
+
+Find Parent Medical Case
+
+↓
+
+Verify Ownership
+
+↓
+
+Delete Report
+
+↓
+
+Success Response
+
+## Outcome
+
+Patients can securely remove reports from their medical records while preventing unauthorized deletions.
+
+# Report Update API
+
+## Endpoint
+
+```http
+PATCH /api/v1/reports/:reportId
+```
+
+## Purpose
+
+Allows patients to update report metadata.
+
+## Updatable Fields
+
+- reportName
+- reportType
+
+## Security
+
+- Valid Patient JWT required
+- Report must exist
+- Parent Medical Case must exist
+- Medical Case must belong to the authenticated patient
+
+## Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Find Report
+
+↓
+
+Find Parent Medical Case
+
+↓
+
+Verify Ownership
+
+↓
+
+Update Fields
+
+↓
+
+Save Report
+
+↓
+
+Success Response
+
+## Outcome
+
+Patients can maintain accurate report information without re-uploading files.
+
+# Doctor Change Password API
+
+## Endpoint
+
+```http
+PATCH /api/v1/doctors/change-password
+```
+
+## Purpose
+
+Allows authenticated doctors to securely change their account password.
+
+## Request Body
+
+```json
+{
+  "oldPassword": "old123",
+  "newPassword": "new123"
+}
+```
+
+## Security
+
+- Valid Doctor JWT required
+- Doctor account must exist
+- Old password must match current password
+
+## Flow
+
+Doctor JWT
+
+↓
+
+Verify Doctor
+
+↓
+
+Find Doctor
+
+↓
+
+Compare Old Password
+
+↓
+
+Hash New Password
+
+↓
+
+Update Password
+
+↓
+
+Success Response
+
+## Outcome
+
+Doctors can securely update their account credentials without administrator intervention.
+
+---
+
+# Report Update API
+
+## Endpoint
+
+```http
+PATCH /api/v1/reports/:reportId
+```
+
+## Purpose
+
+Allows patients to update report details.
+
+## Updatable Fields
+
+- reportName
+- reportType
+
+## Security
+
+- Valid Patient JWT required
+- Report must exist
+- Medical Case must belong to the authenticated patient
+
+## Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Find Report
+
+↓
+
+Find Parent Medical Case
+
+↓
+
+Verify Ownership
+
+↓
+
+Update Report
+
+↓
+
+Save Changes
+
+↓
+
+Success Response
+
+## Outcome
+
+Patients can modify report metadata without re-uploading documents.
+
+---
+
+# Doctor Profile Update API
+
+## Endpoint
+
+```http
+PATCH /api/v1/doctors/profile
+```
+
+## Purpose
+
+Allows authenticated doctors to update their professional profile information.
+
+## Updatable Fields
+
+- fullName
+- phone
+- qualification
+- specialization
+- workplace
+
+## Security
+
+- Valid Doctor JWT required
+- Doctor account must exist
+
+## Flow
+
+Doctor JWT
+
+↓
+
+Verify Doctor
+
+↓
+
+Find Doctor
+
+↓
+
+Validate Doctor Exists
+
+↓
+
+Update Allowed Fields
+
+↓
+
+Save Changes
+
+↓
+
+Success Response
+
+## Request Body
+
+```json
+{
+  "fullName": "Dr. John Doe",
+  "phone": "9876543210",
+  "qualification": "MBBS, MS Orthopedics",
+  "specialization": "Orthopedic",
+  "workplace": "AIIMS Delhi"
+}
+```
+
+## Response
+
+```json
+{
+  "message": "Profile Updated Successfully",
+  "doctor": {}
+}
+```
+
+## Outcome
+
+Doctors can keep their professional information up to date, enabling accurate representation across the OpenHealth ecosystem.
+
+---
+
+# Medical Case Status Update API
+
+## Endpoint
+
+```http
+PATCH /api/v1/medical-cases/:caseId/status
+```
+
+## Purpose
+
+Allows patients to update the status of a medical case.
+
+## Supported Status Values
+
+- active
+- resolved
+
+## Security
+
+- Valid Patient JWT required
+- Medical Case must exist
+- Medical Case must belong to the authenticated patient
+
+## Request Body
+
+```json
+{
+  "status": "resolved"
+}
+```
+
+## Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Find Medical Case
+
+↓
+
+Verify Ownership
+
+↓
+
+Validate Status
+
+↓
+
+Update Status
+
+↓
+
+Save Changes
+
+↓
+
+Success Response
+
+## Response
+
+```json
+{
+  "message": "Case status updated",
+  "medicalCase": {}
+}
+```
+
+## Outcome
+
+Patients can mark medical cases as active or resolved, enabling accurate timeline visualization, active case tracking, and future doctor/lab workflows.
+
+## Patient Timeline API
+
+### Endpoint
+
+**GET** `/api/v1/medical-cases/timeline`
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+```text
+Authorization: Bearer <patient-token>
+```
+
+### Description
+
+Fetches the authenticated patient's complete medical timeline.
+
+The timeline includes:
+- Medical cases
+- Reports associated with each case
+- Doctor notes associated with those reports
+
+Medical cases are returned in descending order of creation date.
+
+### Flow
+
+Patient JWT  
+→ Verify Patient  
+→ Fetch Patient's Medical Cases  
+→ Fetch Reports for Each Case  
+→ Fetch Doctor Notes for Those Reports  
+→ Return Timeline
+
+### Example Response
+
+```json
+{
+  "message": "Timeline fetched successfully",
+  "timeline": [
+    {
+      "medicalCase": {},
+      "reports": [],
+      "doctorNotes": []
+    }
+  ]
+}
+```
+
+## Get Active Medical Cases API
+
+### Endpoint
+
+**GET** `/api/v1/medical-cases/active-cases`
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+```text
+Authorization: Bearer <patient-token>
+```
+
+### Description
+
+Fetches all active medical cases belonging to the authenticated patient.
+
+### Security
+
+- Valid Patient JWT required
+- Only returns cases owned by the authenticated patient
+
+### Flow
+
+Patient JWT
+
+→ Verify Patient
+
+→ Find Medical Cases
+
+→ Filter Status = "active"
+
+→ Return Active Cases
+
+### Example Response
+
+```json
+{
+  "message": "Active cases fetched successfully",
+  "activeCases": []
+}
+```
+
+### Outcome
+
+Allows patients to quickly view ongoing medical conditions and supports dashboard statistics, timeline filtering, doctor portal access, and laboratory workflows.
+
+## Get Resolved Medical Cases API
+
+### Endpoint
+
+**GET** `/api/v1/medical-cases/resolved-cases`
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+```text
+Authorization: Bearer <patient-token>
+```
+
+### Description
+
+Fetches all resolved medical cases belonging to the authenticated patient.
+
+### Security
+
+- Valid Patient JWT required
+- Only returns cases owned by the authenticated patient
+
+### Flow
+
+Patient JWT
+
+→ Verify Patient
+
+→ Find Medical Cases
+
+→ Filter Status = "resolved"
+
+→ Return Resolved Cases
+
+### Example Response
+
+```json
+{
+  "message": "Resolved cases fetched successfully",
+  "resolvedCases": []
+}
+```
+
+### Outcome
+
+Allows patients to quickly view completed or closed medical cases, improving timeline organization and supporting future analytics and reporting features.
+```
+
+## Search Patient By OHID API
+
+### Endpoint
+
+**GET** `/api/v1/doctors/search/:ohid`
+
+### Authentication
+
+Requires a valid Doctor JWT.
+
+```text
+Authorization: Bearer <doctor-token>
+```
+
+### Description
+
+Allows an authenticated doctor to search for a patient using their OpenHealth ID (OHID).
+
+### Security
+
+- Valid Doctor JWT required
+- Patient must exist in the system
+
+### Flow
+
+Doctor JWT
+
+→ Verify Doctor
+
+→ Extract OHID from URL
+
+→ Find Patient by OHID
+
+→ Return Patient Details
+
+### Example Request
+
+```http
+GET /api/v1/doctors/search/OH-180cc7c5-98ef-4665-a8d7-d66483c3ae4b
+```
+
+### Example Response
+
+```json
+{
+  "message": "Patient found",
+  "patient": {}
+}
+```
+
+### Outcome
+
+Provides the foundation for the Doctor Portal, enabling doctors to locate patients before accessing timelines, reports, notes, prescriptions, and future consent-based medical records.
+
+## Doctor View Patient Timeline API
+
+### Endpoint
+
+**GET** `/api/v1/doctors/patient/:patientId/timeline`
+
+### Authentication
+
+Requires a valid Doctor JWT.
+
+```text
+Authorization: Bearer <doctor-token>
+```
+
+### Description
+
+Allows an authenticated doctor to view a patient's complete medical timeline.
+
+The timeline includes:
+
+- Medical Cases
+- Reports
+- Doctor Notes
+
+Medical cases are returned in descending order of creation date.
+
+### Security
+
+- Valid Doctor JWT required
+- Patient must exist in the system
+
+### Flow
+
+Doctor JWT
+
+→ Verify Doctor
+
+→ Find Patient
+
+→ Fetch Medical Cases
+
+→ Fetch Reports
+
+→ Fetch Doctor Notes
+
+→ Return Timeline
+
+### Example Request
+
+```http
+GET /api/v1/doctors/patient/6a7ca25442baf19c0f84f42f/timeline
+```
+
+### Example Response
+
+```json
+{
+  "message": "Timeline fetched successfully",
+  "timeline": [
+    {
+      "medicalCase": {},
+      "reports": [],
+      "doctorNotes": []
+    }
+  ]
+}
+```
+
+### Outcome
+
+Provides doctors with a complete view of a patient's medical history, reports, and observations, forming the foundation of the Doctor Portal.
+
+## Prescription Model
+
+### Purpose
+
+Stores doctor prescriptions linked to a patient's medical case.
+
+### Relationship
+
+Patient
+
+↓
+
+Medical Case
+
+↓
+
+Prescription
+
+### Fields
+
+- patientId
+- doctorId
+- medicalCaseId
+- medicines
+
+Medicine Object:
+
+- medicine
+- dosage
+- frequency
+- duration
+- notes
+
+### Design Decision
+
+Each prescription is stored as a separate document.
+
+When a doctor writes a new prescription, a new Prescription document is created instead of updating the previous one.
+
+Benefits:
+
+- Preserves prescription history
+- Supports multiple follow-up visits
+- Enables timeline-based viewing
+- Maintains complete treatment records
+
+### Example Structure
+
+```json
+{
+  "patientId": "...",
+  "doctorId": "...",
+  "medicalCaseId": "...",
+  "medicines": [
+    {
+      "medicine": "Paracetamol",
+      "dosage": "500mg",
+      "frequency": "Twice Daily",
+      "duration": "5 Days",
+      "notes": "After meals"
+    }
+  ]
+}
+```
+
+## Create Prescription API
+
+### Endpoint
+
+POST /api/v1/prescriptions/create
+
+### Authentication
+
+Requires a valid Doctor JWT.
+
+### Purpose
+
+Allows doctors to create prescriptions for a patient's medical case.
+
+### Flow
+
+Doctor JWT
+
+↓
+
+Verify Doctor
+
+↓
+
+Find Medical Case
+
+↓
+
+Extract Patient ID
+
+↓
+
+Create Prescription
+
+↓
+
+MongoDB
+
+↓
+
+Success Response
+
+### Request Body
+
+```json
+{
+  "medicalCaseId": "MEDICAL_CASE_ID",
+  "medicines": [
+    {
+      "medicine": "Paracetamol",
+      "dosage": "500mg",
+      "frequency": "Twice Daily",
+      "duration": "5 Days",
+      "notes": "After meals"
+    }
+  ]
+}
+```
+
+### Security
+
+- Valid Doctor JWT required
+- Medical Case must exist
+
+### Metadata
+
+- doctorId is automatically extracted from authenticated doctor
+- patientId is automatically extracted from the linked medical case
+
+### Outcome
+
+Doctors can create structured prescriptions linked directly to a patient's medical case while preserving complete prescription history.
+
+## Prescriptions in Timeline
+
+### Purpose
+
+Integrate prescriptions directly into the patient timeline.
+
+### Design
+
+The timeline acts as the single source of truth for patient history.
+
+Timeline now contains:
+
+- Medical Cases
+- Reports
+- Doctor Notes
+- Prescriptions
+
+### Patient Timeline
+
+Updated timeline response:
+
+```js
+{
+  medicalCase,
+  reports,
+  doctorNotes,
+  prescriptions
+}
+```
+
+### Doctor Timeline
+
+Updated timeline response:
+
+```js
+{
+  medicalCase,
+  reports,
+  doctorNotes,
+  prescriptions
+}
+```
+
+### Flow
+
+Patient / Doctor
+
+↓
+
+Timeline API
+
+↓
+
+Medical Cases
+
+↓
+
+Reports
+
+↓
+
+Doctor Notes
+
+↓
+
+Prescriptions
+
+↓
+
+Unified Timeline Response
+
+### Benefits
+
+- No separate prescription viewing screen required
+- Prescriptions automatically appear in medical history
+- Patient and doctor see the same timeline data
+- Supports future OTP-based doctor access model
+- Keeps all medical records in a single chronological view
+
+### Outcome
+
+Every prescription created by a doctor becomes part of the patient's medical timeline and is visible through timeline APIs.
+
+## Doctor Request Consent API
+
+### Endpoint
+
+POST /api/v1/doctors/request-consent
+
+### Authentication
+
+Requires a valid Doctor JWT.
+
+### Purpose
+
+Allows a doctor to request access to a patient's medical timeline.
+
+### Flow
+
+Doctor JWT
+
+↓
+
+Verify Doctor
+
+↓
+
+Find Patient
+
+↓
+
+Generate OTP
+
+↓
+
+Create Consent Record
+
+↓
+
+Store OTP with Expiry
+
+↓
+
+Success Response
+
+### Request Body
+
+```json
+{
+  "patientId": "PATIENT_ID"
+}
+```
+
+### Consent Fields
+
+- patientId
+- doctorId
+- otp
+- expiresAt
+- isUsed
+
+### Security
+
+- Valid Doctor JWT required
+- Patient must exist
+- OTP expires after 10 minutes
+- OTP can only be used once
+
+### Response
+
+```json
+{
+  "message": "Consent OTP Generated",
+  "doctorName": "Dr. John Doe",
+  "dhid": "DHID123",
+  "otp": "123456"
+}
+```
+
+### Outcome
+
+Doctors can initiate access requests for patient timelines. The generated OTP acts as the patient's approval mechanism before timeline access is granted.
+
+## Doctor Verify Consent API
+
+### Endpoint
+
+POST /api/v1/doctors/verify-consent
+
+### Authentication
+
+Requires a valid Doctor JWT.
+
+### Purpose
+
+Allows doctors to verify a patient-provided OTP and gain authorized access to the patient's timeline.
+
+### Flow
+
+Doctor JWT
+
+↓
+
+Verify Doctor
+
+↓
+
+Find Consent Record
+
+↓
+
+Validate OTP
+
+↓
+
+Check Expiry
+
+↓
+
+Mark Consent As Used
+
+↓
+
+Grant Access
+
+↓
+
+Success Response
+
+### Request Body
+
+```json
+{
+  "patientId": "PATIENT_ID",
+  "otp": "123456"
+}
+```
+
+### Security
+
+- Valid Doctor JWT required
+- OTP must match
+- OTP must belong to the requesting doctor
+- OTP must belong to the selected patient
+- OTP expires after 10 minutes
+- OTP can only be used once
+
+### Outcome
+
+Doctors can securely verify patient consent before accessing sensitive medical timelines.
+
+
+## Doctor End Session API
+
+### Endpoint
+
+POST /api/v1/doctors/end-session
+
+### Authentication
+
+Requires a valid Doctor JWT.
+
+### Purpose
+
+Revokes a doctor's temporary access to a patient's timeline after consultation is completed.
+
+### Flow
+
+Doctor JWT
+
+↓
+
+Verify Doctor
+
+↓
+
+Find Active Consent
+
+↓
+
+Revoke Access
+
+↓
+
+Save Consent
+
+↓
+
+Success Response
+
+### Request Body
+
+```json
+{
+  "patientId": "PATIENT_ID"
+}
+```
+
+### Security
+
+- Valid Doctor JWT required
+- Doctor can only end their own session
+- Requires an active consent session
+- Timeline access is revoked immediately
+
+### Outcome
+
+Patient timeline access becomes unavailable until a new OTP is requested and verified.
+
+## Audit Log System
+
+### Purpose
+
+Tracks all sensitive doctor interactions with patient medical records.
+
+### Actions Logged
+
+- CONSENT_REQUESTED
+- CONSENT_VERIFIED
+- TIMELINE_VIEWED
+- SESSION_ENDED
+
+### Audit Log Fields
+
+- patientId
+- doctorId
+- action
+- createdAt
+
+### Flow
+
+Doctor Requests Consent
+↓
+Audit Log Created
+
+Doctor Verifies Consent
+↓
+Audit Log Created
+
+Doctor Views Timeline
+↓
+Audit Log Created
+
+Doctor Ends Session
+↓
+Audit Log Created
+
+### Security Benefits
+
+- Creates an access history for every patient
+- Improves transparency
+- Supports compliance and auditing
+- Enables future patient-facing access history
+
+### Outcome
+
+Every access request, approval, timeline view, and session termination is permanently recorded in the system.
+
+## Patient Audit Logs API
+
+### Endpoint
+
+GET /api/v1/patients/audit-logs
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Allows patients to view a history of doctor interactions with their medical records.
+
+### Data Returned
+
+- doctorId
+- doctor name
+- doctor DHID
+- action
+- timestamp
+
+### Actions
+
+- CONSENT_REQUESTED
+- CONSENT_VERIFIED
+- TIMELINE_VIEWED
+- SESSION_ENDED
+
+### Security Benefits
+
+- Transparency
+- Accountability
+- Access Monitoring
+- Patient Awareness
+
+### Outcome
+
+Patients can view a complete history of who accessed their medical records and when the access occurred.
+
+## Patient Revoke Consent API
+
+### Endpoint
+
+POST /api/v1/patients/revoke-consent
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Allows patients to immediately revoke a doctor's active access to their medical timeline.
+
+### Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Find Active Consent
+
+↓
+
+Revoke Access
+
+↓
+
+Save Consent
+
+↓
+
+Success Response
+
+### Request Body
+
+```json
+{
+  "doctorId": "DOCTOR_ID"
+}
+```
+
+### Security
+
+- Valid Patient JWT required
+- Patient can only revoke access to their own records
+- Doctor access is removed immediately
+- New OTP verification is required for future access
+
+### Outcome
+
+Patients maintain full control over who can access their medical history.
+
+## Report Upload System (Cloudinary)
+
+### Purpose
+
+Allows patients to upload medical reports directly to OpenHealth.
+
+Supported file types:
+
+- PDF
+- JPG
+- JPEG
+- PNG
+
+Uploaded files are stored in Cloudinary and linked to a medical case.
+
+### Architecture
+
+Patient
+
+↓
+
+Upload Report
+
+↓
+
+Cloudinary
+
+↓
+
+File URL Generated
+
+↓
+
+MongoDB Report Document Created
+
+↓
+
+Visible in Timeline
+
+### Dependencies
+
+```bash
+npm install cloudinary multer multer-storage-cloudinary
+```
+
+### Environment Variables
+
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+### Cloudinary Configuration
+
+Cloudinary is configured through:
+
+```txt
+src/config/cloudinary.js
+```
+
+### Upload Middleware
+
+Uses:
+
+- multer
+- multer-storage-cloudinary
+
+Middleware:
+
+```txt
+upload.single("file")
+```
+
+### Endpoint
+
+POST /api/v1/reports/create
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Content Type
+
+```txt
+multipart/form-data
+```
+
+### Request Body
+
+| Field | Type |
+|---------|---------|
+| medicalCaseId | Text |
+| reportName | Text |
+| reportType | Text |
+| file | File |
+
+### Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Verify Medical Case
+
+↓
+
+Upload File To Cloudinary
+
+↓
+
+Generate File URL
+
+↓
+
+Create Report Document
+
+↓
+
+Success Response
+
+### Report Fields Stored
+
+- medicalCaseId
+- reportName
+- reportType
+- fileUrl
+- fileType
+- uploadedByType
+- uploadedById
+
+### Security
+
+- Valid Patient JWT required
+- Patient must own the medical case
+- Only supported file types allowed
+- Files stored outside application server
+
+### Outcome
+
+Patients can upload medical reports directly to OpenHealth and access them later through their medical timeline.
+
+## Family Group Creation
+
+### Endpoint
+
+POST /api/v1/family/create
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Allows a patient to create a private healthcare family group.
+
+### Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Generate Invitation Code
+
+↓
+
+Create Family Group
+
+↓
+
+Add Creator As Admin
+
+↓
+
+Add Creator As Member
+
+↓
+
+Success Response
+
+### Request Body
+
+```json
+{
+  "groupName": "Poswal Family"
+}
+```
+
+### Group Fields
+
+- groupName
+- invitationCode
+- admins
+- members
+
+### Default Member Entry
+
+```json
+{
+  "patientId": "PATIENT_ID",
+  "relationship": "Self"
+}
+```
+
+### Security
+
+- Valid Patient JWT required
+- Family Groups are private by default
+- Creator becomes first admin
+- Creator becomes first member
+- Invitation code is generated automatically
+
+### Response
+
+```json
+{
+  "message": "Family Group Created Successfully",
+  "familyGroup": {}
+}
+```
+
+### Outcome
+
+Patients can create private family healthcare groups that will later support timeline access, AI summaries, digital wills, and family health management.
+```
+
+---
+
+## Family Group Listing
+
+### Endpoint
+
+GET /api/v1/family/my-groups
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Fetches all family groups where the logged-in patient is a member.
+
+### Flow
+
+Patient JWT
+
+↓
+
+Verify Patient
+
+↓
+
+Find Groups Containing Patient
+
+↓
+
+Return Groups
+
+↓
+
+Success Response
+
+### Query Logic
+
+```js
+FamilyGroup.find({
+  "members.patientId": req.patient.patientID
+})
+```
+
+### Security
+
+- Valid Patient JWT required
+- Only groups containing the patient are returned
+
+### Response
+
+```json
+{
+  "message": "Groups fetched successfully",
+  "groups": []
+}
+```
+
+### Outcome
+
+Patients can view all family groups they belong to and access them from the frontend dashboard.
+
+## Family Group Invitation System
+
+### Purpose
+
+Allows Family Group admins to invite patients into a family group while ensuring the invited patient explicitly approves membership.
+
+### Workflow
+
+Group Admin
+
+↓
+
+Send Invitation
+
+↓
+
+Invitation Stored
+
+↓
+
+Patient Views Pending Invitations
+
+↓
+
+Accept / Reject Invitation
+
+↓
+
+Membership Updated
+
+---
+
+## Family Invite Model
+
+### Collection
+
+FamilyInvite
+
+### Fields
+
+- groupId
+- invitedPatientId
+- invitedBy
+- relationship
+- status
+
+### Status Values
+
+- PENDING
+- ACCEPTED
+- REJECTED
+
+### Purpose
+
+Stores pending and completed family group invitations.
+
+---
+
+## Invite Member API
+
+### Endpoint
+
+POST /api/v1/family/invite-member
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Allows a Family Group admin to invite another patient into the group.
+
+### Request Body
+
+```json
+{
+  "groupId": "GROUP_ID",
+  "ohid": "OH-XXXX",
+  "relationship": "Father"
+}
+```
+
+### Flow
+
+Patient JWT
+
+↓
+
+Verify Family Group
+
+↓
+
+Verify Admin Access
+
+↓
+
+Find Patient By OHID
+
+↓
+
+Check Existing Membership
+
+↓
+
+Check Existing Pending Invite
+
+↓
+
+Create Invitation
+
+↓
+
+Success Response
+
+### Security
+
+- Valid Patient JWT required
+- Only group admins can send invitations
+- Duplicate pending invites prevented
+- Existing members cannot be re-invited
+
+### Response
+
+```json
+{
+  "message": "Invitation sent successfully",
+  "invite": {}
+}
+```
+
+### Outcome
+
+Family Group admins can securely invite patients into healthcare groups.
+
+---
+
+## Get My Invites API
+
+### Endpoint
+
+GET /api/v1/family/my-invites
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Allows patients to view all pending family group invitations.
+
+### Flow
+
+Patient JWT
+
+↓
+
+Find Pending Invitations
+
+↓
+
+Return Invitations
+
+↓
+
+Success Response
+
+### Query Logic
+
+```js
+FamilyInvite.find({
+  invitedPatientId: req.patient.patientID,
+  status: "PENDING"
+})
+```
+
+### Security
+
+- Valid Patient JWT required
+- Patients can only view their own invitations
+
+### Response
+
+```json
+{
+  "message": "Invites fetched successfully",
+  "invites": []
+}
+```
+
+### Outcome
+
+Patients can view all family group invitations awaiting action.
+
+---
+
+## Accept Invite API
+
+### Endpoint
+
+POST /api/v1/family/accept-invite
+
+### Authentication
+
+Requires a valid Patient JWT.
+
+### Purpose
+
+Allows patients to join a Family Group after approving an invitation.
+
+### Request Body
+
+```json
+{
+  "inviteId": "INVITE_ID"
+}
+```
+
+### Flow
+
+Patient JWT
+
+↓
+
+Verify Invite
+
+↓
+
+Verify Invite Ownership
+
+↓
+
+Update Invite Status
+
+↓
+
+Find Family Group
+
+↓
+
+Add Member To Group
+
+↓
+
+Save Group
+
+↓
+
+Success Response
+
+### Security
+
+- Valid Patient JWT required
+- Patients can only accept their own invitations
+- Group membership is granted only after approval
+
+### Response
+
+```json
+{
+  "message": "Invite accepted successfully"
+}
+```
+
+### Outcome
+
+Patients become official members of a Family Group after approving the invitation.
+
+---
+
+## Family Group Membership Flow
+
+### Complete Flow
+
+Create Group
+
+↓
+
+Invite Member
+
+↓
+
+Patient Views Invites
+
+↓
+
+Patient Accepts Invite
+
+↓
+
+Patient Added To Family Group
+
+↓
+
+Visible In My Groups
+
+### Outcome
+
+Family Groups now support secure invitation-based membership management while maintaining patient consent and healthcare privacy.
+
+# Family Group Module
+
+## Overview
+
+Family Groups allow patients to create healthcare groups with family members and securely share healthcare information.
+
+Membership is invitation-based and requires patient approval.
+
+---
+
+## Family Group Model
+
+### Fields
+
+- groupName
+- invitationCode
+- admins
+- members
+
+### Member Fields
+
+- patientId
+- relationship
+
+### Features
+
+- Multiple admins supported
+- Multiple members supported
+- Patients can belong to multiple groups
+
+---
+
+## Family Invitation Model
+
+### Fields
+
+- groupId
+- invitedPatientId
+- invitedBy
+- relationship
+- status
+
+### Status
+
+- PENDING
+- ACCEPTED
+- REJECTED
+
+---
+
+## Create Family Group
+
+### Endpoint
+
+POST /api/v1/family/create
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Creates a new Family Group.
+
+### Outcome
+
+Creator becomes:
+
+- Admin
+- Member (Self)
+
+---
+
+## Get My Groups
+
+### Endpoint
+
+GET /api/v1/family/my-groups
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Returns all groups where the patient is a member.
+
+---
+
+## Invite Member
+
+### Endpoint
+
+POST /api/v1/family/invite-member
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Allows admins to invite patients using OHID.
+
+### Security
+
+- Admin only
+- Duplicate pending invites prevented
+- Existing members cannot be re-invited
+
+---
+
+## Get My Invites
+
+### Endpoint
+
+GET /api/v1/family/my-invites
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Returns all pending invitations for the logged-in patient.
+
+---
+
+## Accept Invite
+
+### Endpoint
+
+POST /api/v1/family/accept-invite
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Accepts a pending invitation.
+
+### Outcome
+
+- Invite status updated to ACCEPTED
+- Patient added to group members
+
+---
+
+## Reject Invite
+
+### Endpoint
+
+POST /api/v1/family/reject-invite
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Rejects a pending invitation.
+
+### Outcome
+
+- Invite status updated to REJECTED
+
+---
+
+## Leave Group
+
+### Endpoint
+
+POST /api/v1/family/leave-group
+
+### Authentication
+
+Patient JWT Required
+
+### Rules
+
+- Members can leave groups
+- Last admin cannot leave
+- Another admin must exist first
+
+### Outcome
+
+Patient removed from:
+
+- Members
+- Admins (if applicable)
+
+### Auto Delete
+
+Group is automatically deleted if no members remain.
+
+---
+
+## Promote Admin
+
+### Endpoint
+
+POST /api/v1/family/promote-admin
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Promotes a group member to admin.
+
+### Security
+
+- Admin only
+- Member must belong to group
+
+---
+
+## Demote Admin
+
+### Endpoint
+
+POST /api/v1/family/demote-admin
+
+### Authentication
+
+Patient JWT Required
+
+### Rules
+
+- Admin only
+- Last admin cannot be demoted
+
+---
+
+## Remove Member
+
+### Endpoint
+
+POST /api/v1/family/remove-member
+
+### Authentication
+
+Patient JWT Required
+
+### Rules
+
+- Admin only
+- Cannot remove yourself
+- Use Leave Group instead
+- Last admin cannot be removed
+
+---
+
+## Delete Group
+
+### Endpoint
+
+DELETE /api/v1/family/delete-group
+
+### Authentication
+
+Patient JWT Required
+
+### Rules
+
+- Admin only
+
+### Outcome
+
+- Family Group deleted
+- Associated invitations deleted
+
+---
+
+## Future Enhancements
+
+### Timeline Sharing
+
+Endpoint:
+
+GET /api/v1/family/member/:patientId/timeline
+
+Purpose:
+
+Allow family members to view each other's timelines.
+
+Status:
+
+Pending
+
+---
+
+### AI Summary Sharing
+
+Endpoint:
+
+GET /api/v1/family/member/:patientId/ai-summary
+
+Purpose:
+
+Allow family members to view each other's AI-generated health summaries.
+
+Status:
+
+Pending
+
+---
+
+## Outcome
+
+Family Groups now provide:
+
+- Group creation
+- Invitation workflow
+- Membership management
+- Admin management
+- Group deletion
+
+while maintaining patient-controlled onboarding through invitation acceptance.
+
+# Digital Will Module
+
+## Overview
+
+Digital Will allows patients to securely store important personal information, instructions, and documents that can later be accessed by authorized family members after verification.
+
+The module is designed to be scalable and section-based.
+
+---
+
+## Digital Will Model
+
+### Fields
+
+- patientId
+- sections
+- isUnlocked
+
+### Section Fields
+
+- title
+- content
+- links
+
+### Example Section
+
+```json
+{
+  "title": "Insurance",
+  "content": "LIC Policy Number 12345",
+  "links": [
+    "https://licindia.in"
+  ]
+}
+```
+
+---
+
+## Default Sections
+
+Digital Will is automatically created with:
+
+- Personal Message
+- Important Documents
+- Insurance
+- Emergency Contacts
+- Bank Details
+- Passwords
+- Final Wishes
+- Custom Notes
+
+---
+
+## Create Digital Will
+
+### Endpoint
+
+POST /api/v1/digital-will/create
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Creates a Digital Will for the logged-in patient.
+
+### Rules
+
+- One patient can have only one Digital Will.
+
+### Outcome
+
+Creates default sections for future updates.
+
+---
+
+## Get My Digital Will
+
+### Endpoint
+
+GET /api/v1/digital-will/me
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Returns the patient's Digital Will.
+
+---
+
+## Update Section
+
+### Endpoint
+
+PATCH /api/v1/digital-will/update-section
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Updates content and links inside a specific section.
+
+### Request Body
+
+```json
+{
+  "title": "Insurance",
+  "content": "LIC Policy Number 12345",
+  "links": [
+    "https://licindia.in"
+  ]
+}
+```
+
+### Features
+
+- Update section content
+- Store clickable links
+- Supports future expansion
+
+---
+
+## Delete Digital Will
+
+### Endpoint
+
+DELETE /api/v1/digital-will/delete
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Deletes the patient's Digital Will.
+
+---
+
+## Security
+
+- Patient JWT required
+- Patients can access only their own Digital Will
+- Digital Will remains locked by default
+- Family access not yet implemented
+
+---
+
+## Future Enhancements
+
+### Death Certificate Upload
+
+Purpose:
+
+Allow family members to submit proof of death.
+
+### Death Verification
+
+Purpose:
+
+Verify uploaded death certificate before unlocking the will.
+
+### Unlock Digital Will
+
+Purpose:
+
+Grant family access after verification.
+
+### Family Digital Will Access
+
+Purpose:
+
+Allow authorized family members to view the Digital Will.
+
+### Audit Logs
+
+Purpose:
+
+Track all Digital Will access activity.
+
+---
+
+## Outcome
+
+Patients can:
+
+- Create a Digital Will
+- Store important information
+- Organize information into sections
+- Add useful links
+- Update information anytime
+
+while maintaining a scalable structure for future Digital Will features.
+
+# Death Certificate Module
+
+## Overview
+
+Allows family members to upload a death certificate for a patient.
+
+The module currently stores and retrieves death certificates.
+
+Verification and Digital Will unlocking are planned for future releases.
+
+---
+
+## Death Certificate Model
+
+### Fields
+
+- patientId
+- uploadedBy
+- fileUrl
+- status
+- remarks
+
+### Status Values
+
+- PENDING
+- APPROVED
+- REJECTED
+
+---
+
+## Upload Death Certificate
+
+### Endpoint
+
+POST /api/v1/death-certificate/upload
+
+### Authentication
+
+Patient JWT Required
+
+### Content Type
+
+multipart/form-data
+
+### Request Body
+
+| Field | Type |
+|---------|---------|
+| patientId | Text |
+| file | File |
+
+### Security
+
+- Must belong to the same Family Group
+- Death certificate required
+- Duplicate uploads prevented
+
+### Flow
+
+Family Member
+
+↓
+
+Upload Certificate
+
+↓
+
+Cloudinary Upload
+
+↓
+
+Store File URL
+
+↓
+
+Create Death Certificate Record
+
+↓
+
+Success Response
+
+---
+
+## Get Death Certificate
+
+### Endpoint
+
+GET /api/v1/death-certificate/:patientId
+
+### Authentication
+
+Patient JWT Required
+
+### Purpose
+
+Fetch death certificate details for a patient.
+
+---
+
+## Current Scope
+
+Implemented:
+
+- Upload Death Certificate
+- Store Certificate URL
+- Retrieve Certificate
+
+Not Implemented:
+
+- Verification Workflow
+- Certificate Approval
+- Certificate Rejection
+- Digital Will Unlocking
+- Family Digital Will Access
+
+---
+
+## Outcome
+
+OpenHealth can now securely store death certificates while remaining flexible for future verification and unlocking workflows.
+
+---
+
+# Family Timeline Access
+
+## Endpoint
+
+GET /api/v1/family/timeline/:patientId
+
+## Authentication
+
+Patient JWT Required
+
+## Purpose
+
+Allows a patient to view the medical timeline of another member within the same family group.
+
+---
+
+## Access Rules
+
+- Requester must belong to the same family group.
+- Target patient must belong to the same family group.
+- Access is denied if both patients are not members of the same family group.
+
+---
+
+## Flow
+
+Patient Requests Family Member Timeline
+
+↓
+
+Validate JWT
+
+↓
+
+Verify Both Patients Belong To Same Family Group
+
+↓
+
+Fetch Medical Cases
+
+↓
+
+Fetch Reports
+
+↓
+
+Fetch Doctor Notes
+
+↓
+
+Fetch Prescriptions
+
+↓
+
+Build Timeline
+
+↓
+
+Return Timeline
+
+---
+
+## Response
+
+Returns:
+
+- Medical Cases
+- Reports
+- Doctor Notes
+- Prescriptions
+
+for the requested family member.
+
+---
+
+## Outcome
+
+Family members can securely access each other's medical timelines while maintaining family-group based authorization.
+
+---
+
+# Updates (02 October)
+
+## Consent System Improvements
+
+### Added Patient Consent Management
+
+- Revoke Consent
+- View Audit Logs
+
+### Added Doctor Consent Management
+
+- Request Consent
+- Verify Consent
+- End Session
+
+### Added Session Visibility
+
+- Doctor Active Sessions
+- Patient Active Consents
+
+### Added Timeline Security
+
+Doctors can access timelines only when:
+
+- Consent exists
+- OTP is verified
+- Session is active
+
+All timeline access is audit logged.
+
+---
+
+## Digital Will Enhancements
+
+### Added Death Certificate Approval Flow
+
+Flow:
+
+Death Certificate Uploaded
+
+↓
+
+Admin Approval
+
+↓
+
+Digital Will Unlocked
+
+Digital Will remains locked until approval.
+
+---
+
+## Family Timeline Access
+
+Family members can now:
+
+- Access authorized family profiles
+- Fetch complete medical timelines
+
+Timeline includes:
+
+- Medical Cases
+- Reports
+- Doctor Notes
+- Prescriptions
+
+Family-group authorization enforced.
+
+---
+
+## Backend Status
+
+Core Backend APIs are now functionally complete.
+
+Modules Completed:
+
+- Patient
+- Doctor
+- Medical Cases
+- Reports
+- Prescriptions
+- Consent
+- Audit Logs
+- Family Groups
+- Digital Will
+- Death Certificate
+- Family Timeline Access
